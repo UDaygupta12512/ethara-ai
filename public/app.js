@@ -67,8 +67,20 @@ function switchAuth(tab, prefill = '') {
   select('tab-signup').classList.toggle('active', !isLogin);
   select('form-login').style.display = isLogin ? 'block' : 'none';
   select('form-signup').style.display = !isLogin ? 'block' : 'none';
-  select('auth-error').classList.remove('show');
+  // clear error and re-trigger animation if shown again
+  const err = select('auth-error');
+  err.classList.remove('visible');
+  err.textContent = '';
   if (isLogin && prefill) select('login-email').value = prefill;
+}
+
+function showAuthError(msg) {
+  const el = select('auth-error');
+  el.textContent = msg;
+  // Remove and re-add to retrigger shake animation
+  el.classList.remove('visible');
+  void el.offsetWidth; // force reflow
+  el.classList.add('visible');
 }
 
 async function doLogin(e) {
@@ -77,26 +89,29 @@ async function doLogin(e) {
   const email = select('login-email').value.trim();
   const pass = select('login-pass').value;
 
-  if (!email || !pass) return notify('Email and password required', 'error');
+  if (!email || !pass) { showAuthError('Please enter your email and password.'); return; }
 
   btn.disabled = true;
+  btn.textContent = 'Signing in...';
   try {
     const res = await request('POST', '/auth/login', { email, password: pass });
     auth_token = res.token;
     localStorage.setItem('ethara_v1_token', auth_token);
-    
+
     if (select('login-remember') && select('login-remember').checked) {
       localStorage.setItem('ethara_last_email', email);
     } else {
       localStorage.removeItem('ethara_last_email');
     }
-    
+
     user_ctx = res.user;
     bootApp();
   } catch (err) {
-    select('auth-error').textContent = err.message;
-    select('auth-error').classList.add('show');
-  } finally { btn.disabled = false; }
+    showAuthError(err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enter Workspace';
+  }
 }
 
 async function doSignup(e) {
@@ -106,9 +121,13 @@ async function doSignup(e) {
   const email = select('signup-email').value.trim();
   const pass = select('signup-pass').value;
 
-  if (!name || !email || pass.length < 6) return notify('Please fill all fields (Pass min 6 chars)', 'error');
+  if (!name || !email || pass.length < 6) {
+    showAuthError('Please fill all fields. Password must be at least 6 characters.');
+    return;
+  }
 
   btn.disabled = true;
+  btn.textContent = 'Creating workspace...';
   try {
     const res = await request('POST', '/auth/signup', { name, email, password: pass });
     auth_token = res.token;
@@ -117,15 +136,16 @@ async function doSignup(e) {
     user_ctx = res.user;
     bootApp();
   } catch (err) {
-    if (err.message.includes('exists')) {
+    if (err.message.toLowerCase().includes('exist')) {
       switchAuth('login', email);
-      select('auth-error').textContent = 'Account exists. Please log in.';
-      select('auth-error').classList.add('show');
+      showAuthError('An account with that email already exists. Please sign in.');
     } else {
-      select('auth-error').textContent = err.message;
-      select('auth-error').classList.add('show');
+      showAuthError(err.message);
     }
-  } finally { btn.disabled = false; }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Workspace';
+  }
 }
 
 function doLogout() {

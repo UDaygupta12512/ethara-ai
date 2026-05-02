@@ -22,8 +22,8 @@ router.get('/', authenticate, (req, res) => {
       SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END) as done
     FROM tasks t
     JOIN project_members pm ON t.project_id = pm.project_id
-    WHERE pm.user_id = ? AND t.assignee_id = ?
-  `).get(uid, uid);
+    WHERE pm.user_id = ?
+  `).get(uid);
 
   const overdue = db.prepare(`
     SELECT t.*, p.name as project_name, p.color as project_color,

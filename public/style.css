@@ -56,6 +56,28 @@ h1, h2, h3, .brand {
 }
 .auth-brand { font-size: 2.2rem; margin-bottom: 8px; color: var(--accent); }
 .auth-sub { color: var(--muted); margin-bottom: 32px; font-size: 0.95rem; }
+.auth-error {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  font-size: 0.875rem;
+  text-align: center;
+  display: none;
+}
+.auth-error.visible {
+  display: block;
+  animation: shake 0.35s ease-in-out;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
 
 /* Navigation */
 .topbar {
