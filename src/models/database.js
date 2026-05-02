@@ -2,17 +2,25 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../../data/taskflow.db');
-const dataDir = path.dirname(DB_PATH);
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+let DB_PATH;
+if (process.env.DB_PATH) {
+  DB_PATH = process.env.DB_PATH;
+} else if (process.env.NODE_ENV === 'production') {
+  DB_PATH = '/tmp/taskflow.db';
+} else {
+  DB_PATH = path.join(__dirname, '../../data/taskflow.db');
+  const dataDir = path.dirname(DB_PATH);
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+}
 
+console.log('[DB] Using database at:', DB_PATH);
 const db = new Database(DB_PATH);
 
-db.pragma('journal_mode = WAL');
+db.pragma('journal_mode = DELETE');
 db.pragma('foreign_keys = ON');
 db.pragma('synchronous = NORMAL');
 db.pragma('temp_store = MEMORY');
-db.pragma('cache_size = -16000'); 
+db.pragma('cache_size = -8000'); 
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (

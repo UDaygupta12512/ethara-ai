@@ -5,7 +5,11 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
-const db = new Database(path.join(__dirname, '../data/taskflow.db'));
+const DB_PATH = process.env.DB_PATH ||
+  (process.env.NODE_ENV === 'production' ? '/tmp/taskflow.db' : path.join(__dirname, '../data/taskflow.db'));
+
+console.log('Using DB at:', DB_PATH);
+const db = new Database(DB_PATH);
 db.pragma('foreign_keys = ON');
 
 async function seed() {

@@ -5,6 +5,11 @@ const helmet  = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path    = require('path');
 
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  console.error('[FATAL] JWT_SECRET environment variable is not set. Set it in Railway Variables tab.');
+  process.exit(1);
+}
+
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
@@ -44,8 +49,17 @@ app.use((err, _req, res, _next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Ethara AI running on http://localhost:${PORT}`);
-  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Ethara running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('[Uncaught Exception]', err.message, err.stack);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[Unhandled Rejection]', reason);
 });
 
 module.exports = app;
