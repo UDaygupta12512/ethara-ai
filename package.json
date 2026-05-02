@@ -4,7 +4,7 @@
   "description": "Premium project management and team collaboration platform.",
   "main": "src/server.js",
   "scripts": {
-    "build": "npm rebuild better-sqlite3",
+    "build": "npm install && npm rebuild better-sqlite3 --build-from-source",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },

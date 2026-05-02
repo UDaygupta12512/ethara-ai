@@ -1,2 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_20", "python3", "gcc", "gnumake"]
+nixPkgs = ["nodejs_20", "python3", "gcc", "g++", "gnumake"]
+
+[phases.build]
+cmds = ["npm install", "npm rebuild better-sqlite3 --build-from-source"]

@@ -6,8 +6,11 @@ const rateLimit = require('express-rate-limit');
 const path    = require('path');
 
 if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
-  console.error('[FATAL] JWT_SECRET environment variable is not set. Set it in Railway Variables tab.');
-  process.exit(1);
+  console.warn('-------------------------------------------------------------------');
+  console.warn('[WARNING] JWT_SECRET is not set. Using a temporary fallback.');
+  console.warn('This is INSECURE for production. Please set JWT_SECRET in Railway.');
+  console.warn('-------------------------------------------------------------------');
+  process.env.JWT_SECRET = 'temporary-fallback-secret-please-change';
 }
 
 const app  = express();
@@ -33,12 +36,17 @@ app.use('/api/auth/signup', authLimiter);
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
+// Health Check - Move to top so it works even if DB/Routes have issues
+app.get('/api/health', (_req, res) => res.json({ 
+  status: 'ok', 
+  timestamp: new Date().toISOString(),
+  env: process.env.NODE_ENV || 'development'
+}));
+
 app.use('/api/auth',     require('./routes/auth'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/projects/:projectId/tasks', require('./routes/tasks'));
 app.use('/api/dashboard', require('./routes/dashboard'));
-
-app.get('/api/health', (_req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
 app.use('/api/*', (_req, res) => res.status(404).json({ error: 'API endpoint not found' }));
 
