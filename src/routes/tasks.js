@@ -47,7 +47,7 @@ router.get('/', authenticate, requireProjectRole('member'), [
   if (priority)    { sql += ' AND t.priority = ?';    params.push(priority); }
   if (assignee_id) { sql += ' AND t.assignee_id = ?'; params.push(assignee_id); }
 
-  sql += ' ORDER BY CASE t.priority WHEN "urgent" THEN 0 WHEN "high" THEN 1 WHEN "medium" THEN 2 ELSE 3 END, t.created_at DESC';
+  sql += " ORDER BY CASE t.priority WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, t.created_at DESC";
 
   res.json(db.prepare(sql).all(...params));
 });

@@ -13,6 +13,8 @@ if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+app.set('trust proxy', 1);
+
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
