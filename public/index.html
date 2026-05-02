@@ -3,49 +3,66 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ethara AI — Premium Project Management</title>
+  <title>Ethara — Project & Task Management</title>
+  <meta name="description" content="Ethara helps teams track what matters — projects, tasks, and who's doing what." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Auth Screen -->
+
+  <!-- login / signup -->
   <div class="auth" id="auth" style="display:none">
     <div class="auth-card">
-      <div class="auth-brand">Ethara<span>.</span></div>
-      <div class="auth-sub">Elevate your team's workflow.</div>
-      
+      <div class="auth-brand">Ethara</div>
+      <div class="auth-sub">Keep your team moving — not guessing.</div>
+
       <div class="nav" style="margin-bottom:24px;justify-content:center">
         <button id="tab-login" class="active" onclick="showAuth('login')">Sign In</button>
-        <button id="tab-signup" onclick="showAuth('signup')">New Account</button>
+        <button id="tab-signup" onclick="showAuth('signup')">Get Started</button>
       </div>
 
       <form id="form-login" onsubmit="login(event)">
-        <div class="field"><label>Email</label><input class="input" id="login-email" type="email" autocomplete="username" placeholder="name@company.com" required/></div>
-        <div class="field"><label>Password</label><input class="input" id="login-pass" type="password" autocomplete="current-password" placeholder="••••••••" required/></div>
-        <div style="display:flex;align-items:center;margin-top:8px;margin-bottom:16px;font-size:0.85rem;color:var(--muted)">
-          <input type="checkbox" id="login-remember" checked style="margin-right:8px;cursor:pointer">
-          <label for="login-remember" style="cursor:pointer">Remember me</label>
+        <div class="field">
+          <label>Email address</label>
+          <input class="input" id="login-email" type="email" autocomplete="username" placeholder="you@yourcompany.com" required />
         </div>
-        <button class="btn primary full" type="submit">Enter Workspace</button>
+        <div class="field">
+          <label>Password</label>
+          <input class="input" id="login-pass" type="password" autocomplete="current-password" placeholder="••••••••" required />
+        </div>
+        <div style="display:flex;align-items:center;margin-top:8px;margin-bottom:20px;font-size:0.85rem;color:var(--muted)">
+          <input type="checkbox" id="login-remember" checked style="margin-right:8px;cursor:pointer;accent-color:var(--accent)">
+          <label for="login-remember" style="cursor:pointer">Keep me signed in</label>
+        </div>
+        <button class="btn primary full" type="submit">Sign in</button>
       </form>
 
       <form id="form-signup" style="display:none" onsubmit="signup(event)">
-        <div class="field"><label>Full Name</label><input class="input" id="signup-name" type="text" autocomplete="name" placeholder="Alex Rivera" required/></div>
-        <div class="field"><label>Email</label><input class="input" id="signup-email" type="email" autocomplete="username" placeholder="name@company.com" required/></div>
-        <div class="field"><label>Create Password</label><input class="input" id="signup-pass" type="password" autocomplete="new-password" placeholder="Min. 6 characters" required/></div>
-        <button class="btn primary full" style="margin-top:12px" type="submit">Create Workspace</button>
+        <div class="field">
+          <label>Your name</label>
+          <input class="input" id="signup-name" type="text" autocomplete="name" placeholder="e.g. Priya Mehta" required />
+        </div>
+        <div class="field">
+          <label>Work email</label>
+          <input class="input" id="signup-email" type="email" autocomplete="username" placeholder="you@yourcompany.com" required />
+        </div>
+        <div class="field">
+          <label>Choose a password <span style="color:var(--muted);font-weight:400">(6+ characters)</span></label>
+          <input class="input" id="signup-pass" type="password" autocomplete="new-password" placeholder="make it a good one" required />
+        </div>
+        <button class="btn primary full" style="margin-top:14px" type="submit">Create my workspace</button>
       </form>
 
       <div class="auth-error" id="auth-error"></div>
     </div>
   </div>
 
-  <!-- App Main -->
+  <!-- main app shell -->
   <div id="app" style="display:none">
     <div class="topbar">
       <div class="topbar-inner">
-        <div class="brand" onclick="go('dashboard')">Ethara<span>.</span></div>
+        <div class="brand" onclick="go('dashboard')">Ethara</div>
         <div class="nav">
           <button class="active" id="nav-dashboard" onclick="go('dashboard')">Dashboard</button>
           <button id="nav-projects" onclick="go('projects')">Projects</button>
@@ -53,33 +70,37 @@
         <div class="menu">
           <div class="avatar" id="avatar" onclick="toggleMenu()"></div>
           <div class="dropdown" id="dropdown">
-            <div class="dd-item"><b id="dd-name"></b><br/><span class="muted" id="dd-email" style="font-size:0.8rem"></span></div>
+            <div class="dd-item">
+              <b id="dd-name"></b><br/>
+              <span class="muted" id="dd-email" style="font-size:0.8rem"></span>
+            </div>
             <div style="height:1px;background:var(--border);margin:4px 0"></div>
-            <div class="dd-item danger" onclick="logout()">Sign Out</div>
+            <div class="dd-item danger" onclick="logout()">Sign out</div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="container">
-      <!-- Dashboard Page -->
+
+      <!-- dashboard -->
       <div class="page active" id="page-dashboard">
         <div style="margin-bottom:32px">
           <h1 id="greet" style="font-size:2rem">Good morning</h1>
-          <p class="muted">Here is what's happening across your workspace.</p>
+          <p class="muted" style="margin-top:4px">Here's where things stand across your projects.</p>
         </div>
 
         <div class="stat-row">
           <div class="stat">
-            <div class="stat-label">Active Projects</div>
+            <div class="stat-label">Projects</div>
             <div class="stat-val" id="s-projects">0</div>
           </div>
           <div class="stat">
-            <div class="stat-label">Assigned Tasks</div>
+            <div class="stat-label">Total Tasks</div>
             <div class="stat-val" id="s-total">0</div>
           </div>
           <div class="stat">
-            <div class="stat-label">Completed</div>
+            <div class="stat-label">Done</div>
             <div class="stat-val" id="s-done">0</div>
           </div>
           <div class="stat">
@@ -91,40 +112,43 @@
         <div class="grid">
           <div>
             <div class="card">
-              <h3 style="margin-bottom:16px">Recent Tasks</h3>
+              <h3 style="margin-bottom:16px">What's been happening</h3>
               <div id="recent" style="display:flex;flex-direction:column;gap:12px"></div>
             </div>
             <div class="card">
-              <h3 style="margin-bottom:16px;color:#ef4444">⚠️ Needs Attention</h3>
+              <h3 style="margin-bottom:16px;color:#f87171">Needs your attention</h3>
               <div id="overdue" style="display:flex;flex-direction:column;gap:12px"></div>
             </div>
           </div>
           <div>
             <div class="card">
-              <h3 style="margin-bottom:16px">My Progress</h3>
+              <h3 style="margin-bottom:16px">Task breakdown</h3>
               <div id="stats"></div>
             </div>
             <div class="card">
-              <h3 style="margin-bottom:16px">Project Health</h3>
+              <h3 style="margin-bottom:16px">Project progress</h3>
               <div id="projStats" style="display:flex;flex-direction:column;gap:12px"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Projects Page -->
+      <!-- projects list -->
       <div class="page" id="page-projects">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px">
-          <div><h1>Projects</h1><p class="muted">Manage your team's high-level goals.</p></div>
-          <button class="btn primary" onclick="openCreateProject()">+ New Project</button>
+          <div>
+            <h1>Projects</h1>
+            <p class="muted" style="margin-top:4px">All the big things your team is working toward.</p>
+          </div>
+          <button class="btn primary" onclick="openCreateProject()">+ New project</button>
         </div>
         <div class="projects" id="projects"></div>
       </div>
 
-      <!-- Single Project Page -->
+      <!-- single project view -->
       <div class="page" id="page-project">
-        <button class="btn ghost sm" onclick="go('projects')" style="margin-bottom:20px">← All Projects</button>
-        
+        <button class="btn ghost sm" onclick="go('projects')" style="margin-bottom:20px">← Back to projects</button>
+
         <div class="card" style="border-right:6px solid var(--accent)" id="projHeader">
           <div style="display:flex;justify-content:space-between;align-items:flex-start">
             <div>
@@ -147,17 +171,19 @@
 
         <div class="nav" style="margin:24px 0;border-bottom:1px solid var(--border);gap:32px;display:flex;align-items:center;justify-content:space-between">
           <div style="display:flex;gap:32px">
-            <button class="active" data-tab="board" onclick="setTab('board')">Kanban</button>
-            <button data-tab="list" onclick="setTab('list')">List View</button>
+            <button class="active" data-tab="board" onclick="setTab('board')">Board</button>
+            <button data-tab="list" onclick="setTab('list')">List</button>
             <button data-tab="members" onclick="setTab('members')">Team</button>
             <button data-tab="activity" onclick="setTab('activity')">Activity</button>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;font-size:0.85rem;color:var(--muted)">
+          <div style="display:flex;align-items:center;gap:14px;font-size:0.82rem;color:var(--muted)">
             <label style="cursor:pointer;display:flex;align-items:center;gap:6px">
-              <input type="checkbox" id="compactToggle" onchange="toggleCompactMode(event)" />
-              Compact Mode
+              <input type="checkbox" id="compactToggle" onchange="toggleCompactMode(event)" style="accent-color:var(--accent)" />
+              Compact
             </label>
-            <span style="border-left:1px solid var(--border);padding-left:12px">Press <b>N</b> for new task</span>
+            <span style="border-left:1px solid var(--border);padding-left:14px">
+              <kbd style="background:var(--border);padding:2px 6px;border-radius:4px;font-size:0.78rem">N</kbd> new task
+            </span>
           </div>
         </div>
 
@@ -167,20 +193,20 @@
 
         <div id="tab-list" style="display:none">
           <div class="card">
-            <p class="muted" style="text-align:center;padding:40px">List view is currently in preview.</p>
+            <p class="muted" style="text-align:center;padding:40px">List view coming soon — use the board for now.</p>
           </div>
         </div>
 
         <div id="tab-members" style="display:none">
           <div class="grid">
             <div class="card">
-              <h3>Team Members</h3>
+              <h3>Who's on this project</h3>
               <div id="membersList" style="margin-top:16px;display:flex;flex-direction:column;gap:12px"></div>
             </div>
             <div class="card" id="inviteCard" style="display:none">
-              <h3>Invite Member</h3>
-              <p class="muted" style="font-size:0.85rem;margin-bottom:12px">Search users to add to this project.</p>
-              <input class="input" id="memberQuery" placeholder="Enter name or email..."/>
+              <h3>Add someone</h3>
+              <p class="muted" style="font-size:0.85rem;margin:8px 0 12px">Search by name or email to invite a teammate.</p>
+              <input class="input" id="memberQuery" placeholder="Start typing a name..." />
               <div id="searchResults" style="margin-top:8px"></div>
             </div>
           </div>
@@ -188,15 +214,16 @@
 
         <div id="tab-activity" style="display:none">
           <div class="card">
-            <h3>Recent Project Activity</h3>
+            <h3>What's been going on</h3>
             <div id="activityList" style="margin-top:16px;display:flex;flex-direction:column;gap:12px"></div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- Global UI -->
+  <!-- modal + toasts -->
   <div class="modal-wrap" id="modalWrap" onclick="hideModal(event)">
     <div class="modal" id="modal"></div>
   </div>

@@ -1,15 +1,15 @@
 :root {
-  /* Ethara AI - Hand-curated Palette */
-  --bg: #0f172a;        /* Deep slate-midnight */
-  --card-bg: #1e293b;   /* Lighter slate */
+  /* colors — dark slate base, orange accent */
+  --bg: #0f172a;
+  --card-bg: #1e293b;
   --text: #f8fafc;
   --muted: #94a3b8;
-  --accent: #e87c3a;    /* Amber */
+  --accent: #e87c3a;
   --accent-soft: rgba(232, 124, 58, 0.1);
   --border: rgba(255, 255, 255, 0.06);
   --glass: rgba(30, 41, 59, 0.7);
-  
-  /* Spacing & Radii - Slightly irregular for "human" feel */
+
+  /* border radii */
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;

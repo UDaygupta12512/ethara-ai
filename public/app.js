@@ -1,7 +1,6 @@
 /**
- * Ethara AI - Core Logic
- * Author: Team Ethara
- * Note: Keep this lean. Avoid heavy frameworks.
+ * Ethara — main client script
+ * Kept intentionally simple. No build step, no framework.
  */
 
 const _ep = '/api'; // Backend entry point
@@ -175,7 +174,10 @@ function bootApp() {
   av.textContent = getInitials(user_ctx.name);
   select('dd-name').textContent = user_ctx.name;
   select('dd-email').textContent = user_ctx.email;
-  select('greet').textContent = `Welcome back, ${user_ctx.name.split(' ')[0]}`;
+  const hr = new Date().getHours();
+  const greeting = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  const firstName = user_ctx.name.split(' ')[0];
+  select('greet').textContent = `${greeting}, ${firstName}`;
   navigate('dashboard');
 }
 
