@@ -72,7 +72,8 @@ function switchAuth(tab, prefill = '') {
 }
 
 async function doLogin(e) {
-  const btn = e.currentTarget;
+  e.preventDefault();
+  const btn = e.currentTarget.querySelector('button[type="submit"]') || e.currentTarget;
   const email = select('login-email').value.trim();
   const pass = select('login-pass').value;
 
@@ -83,7 +84,13 @@ async function doLogin(e) {
     const res = await request('POST', '/auth/login', { email, password: pass });
     auth_token = res.token;
     localStorage.setItem('ethara_v1_token', auth_token);
-    localStorage.setItem('ethara_last_email', email);
+    
+    if (select('login-remember') && select('login-remember').checked) {
+      localStorage.setItem('ethara_last_email', email);
+    } else {
+      localStorage.removeItem('ethara_last_email');
+    }
+    
     user_ctx = res.user;
     bootApp();
   } catch (err) {
@@ -93,7 +100,8 @@ async function doLogin(e) {
 }
 
 async function doSignup(e) {
-  const btn = e.currentTarget;
+  e.preventDefault();
+  const btn = e.currentTarget.querySelector('button[type="submit"]') || e.currentTarget;
   const name = select('signup-name').value.trim();
   const email = select('signup-email').value.trim();
   const pass = select('signup-pass').value;
@@ -257,6 +265,13 @@ async function openProj(id) {
     setProjectTab('board');
     navigate('project');
     syncBoard();
+
+    // Restore compact mode preference
+    const isCompact = localStorage.getItem('ethara_compact') === 'true';
+    select('compactToggle').checked = isCompact;
+    if (isCompact) select('board').classList.add('compact');
+    else select('board').classList.remove('compact');
+
   } catch (err) { notify(err.message, 'error'); }
 }
 
@@ -451,6 +466,33 @@ async function postComment(id) {
 }
 
 // Misc Logic
+function toggleCompactMode(e) {
+  if (e.target.checked) {
+    select('board').classList.add('compact');
+    localStorage.setItem('ethara_compact', 'true');
+  } else {
+    select('board').classList.remove('compact');
+    localStorage.setItem('ethara_compact', 'false');
+  }
+}
+
+// Global Keyboard Shortcuts
+document.addEventListener('keydown', (e) => {
+  // Ignore if user is typing in an input or textarea
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  // 'N' to create new task if on a project board
+  if (e.key.toLowerCase() === 'n' && active_proj && select('tab-board').style.display === 'block') {
+    e.preventDefault();
+    openNewTaskModal('todo');
+  }
+
+  // 'Escape' to close modals
+  if (e.key === 'Escape' && select('modalWrap').classList.contains('open')) {
+    hideModal();
+  }
+});
+
 function toggleUserMenu() { select('dropdown').classList.toggle('open'); }
 window.onclick = (e) => { if (!e.target.closest('.menu')) select('dropdown')?.classList.remove('open'); };
 
@@ -504,6 +546,7 @@ window.go = navigate;
 window.toggleMenu = toggleUserMenu;
 window.openProj = openProj;
 window.setTab = setProjectTab;
+window.toggleCompactMode = toggleCompactMode;
 window.openCreateProject = () => showModal(`
   <div class="m-h"><div class="m-title">New Project</div><button class="btn ghost sm" onclick="hideModal()">✕</button></div>
   <div class="field"><label>Project Name</label><input class="input" id="cp-name" placeholder="E.g. Website Redesign"/></div>

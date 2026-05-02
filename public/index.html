@@ -20,18 +20,22 @@
         <button id="tab-signup" onclick="showAuth('signup')">New Account</button>
       </div>
 
-      <div id="form-login">
-        <div class="field"><label>Email</label><input class="input" id="login-email" type="email" placeholder="name@company.com"/></div>
-        <div class="field"><label>Password</label><input class="input" id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login(event)"/></div>
-        <button class="btn primary full" style="margin-top:12px" onclick="login(event)">Enter Workspace</button>
-      </div>
+      <form id="form-login" onsubmit="login(event)">
+        <div class="field"><label>Email</label><input class="input" id="login-email" type="email" autocomplete="username" placeholder="name@company.com" required/></div>
+        <div class="field"><label>Password</label><input class="input" id="login-pass" type="password" autocomplete="current-password" placeholder="••••••••" required/></div>
+        <div style="display:flex;align-items:center;margin-top:8px;margin-bottom:16px;font-size:0.85rem;color:var(--muted)">
+          <input type="checkbox" id="login-remember" checked style="margin-right:8px;cursor:pointer">
+          <label for="login-remember" style="cursor:pointer">Remember me</label>
+        </div>
+        <button class="btn primary full" type="submit">Enter Workspace</button>
+      </form>
 
-      <div id="form-signup" style="display:none">
-        <div class="field"><label>Full Name</label><input class="input" id="signup-name" type="text" placeholder="Alex Rivera"/></div>
-        <div class="field"><label>Email</label><input class="input" id="signup-email" type="email" placeholder="name@company.com"/></div>
-        <div class="field"><label>Create Password</label><input class="input" id="signup-pass" type="password" placeholder="Min. 6 characters" onkeydown="if(event.key==='Enter')signup(event)"/></div>
-        <button class="btn primary full" style="margin-top:12px" onclick="signup(event)">Create Workspace</button>
-      </div>
+      <form id="form-signup" style="display:none" onsubmit="signup(event)">
+        <div class="field"><label>Full Name</label><input class="input" id="signup-name" type="text" autocomplete="name" placeholder="Alex Rivera" required/></div>
+        <div class="field"><label>Email</label><input class="input" id="signup-email" type="email" autocomplete="username" placeholder="name@company.com" required/></div>
+        <div class="field"><label>Create Password</label><input class="input" id="signup-pass" type="password" autocomplete="new-password" placeholder="Min. 6 characters" required/></div>
+        <button class="btn primary full" style="margin-top:12px" type="submit">Create Workspace</button>
+      </form>
 
       <div class="error" id="auth-error" style="margin-top:16px;color:#ef4444;font-size:0.85rem;text-align:center;display:none"></div>
     </div>
@@ -141,11 +145,20 @@
           </div>
         </div>
 
-        <div class="nav" style="margin:24px 0;border-bottom:1px solid var(--border);gap:32px">
-          <button class="active" data-tab="board" onclick="setTab('board')">Kanban</button>
-          <button data-tab="list" onclick="setTab('list')">List View</button>
-          <button data-tab="members" onclick="setTab('members')">Team</button>
-          <button data-tab="activity" onclick="setTab('activity')">Activity</button>
+        <div class="nav" style="margin:24px 0;border-bottom:1px solid var(--border);gap:32px;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:32px">
+            <button class="active" data-tab="board" onclick="setTab('board')">Kanban</button>
+            <button data-tab="list" onclick="setTab('list')">List View</button>
+            <button data-tab="members" onclick="setTab('members')">Team</button>
+            <button data-tab="activity" onclick="setTab('activity')">Activity</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;font-size:0.85rem;color:var(--muted)">
+            <label style="cursor:pointer;display:flex;align-items:center;gap:6px">
+              <input type="checkbox" id="compactToggle" onchange="toggleCompactMode(event)" />
+              Compact Mode
+            </label>
+            <span style="border-left:1px solid var(--border);padding-left:12px">Press <b>N</b> for new task</span>
+          </div>
         </div>
 
         <div id="tab-board">

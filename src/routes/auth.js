@@ -13,7 +13,7 @@ const AVATAR_COLORS = [
 
 // Validation helpers
 const nameRules  = body('name').trim().isLength({ min: 2, max: 50 }).withMessage('Name must be 2–50 characters');
-const emailRules = body('email').isEmail().normalizeEmail().withMessage('Valid email address required');
+const emailRules = body('email').isEmail().trim().toLowerCase().withMessage('Valid email address required');
 const passRules  = body('password').isLength({ min: 6, max: 128 }).withMessage('Password must be 6–128 characters');
 
 function validate(req, res) {
@@ -48,28 +48,92 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
 
   const user  = db.prepare('SELECT id, name, email, avatar_color, created_at FROM users WHERE id = ?').get(result.lastInsertRowid);
   
-  // Human Touch: Create a 'Welcome' project so the app isn't empty
+  // Seed rich starter data so the dashboard always looks alive
   try {
-    const proj = db.prepare(
-      'INSERT INTO projects (name, description, color, owner_id) VALUES (?, ?, ?, ?)'
-    ).run('🚀 Getting Started', 'Welcome to Ethara AI! Use this project to explore how tasks and status tracking works.', '#e87c3a', user.id);
-    
-    const pid = proj.lastInsertRowid;
-    db.prepare('INSERT INTO project_members (project_id, user_id, role) VALUES (?, ?, ?)')
-      .run(pid, user.id, 'admin');
+    const today = new Date();
+    const dt = (offsetDays) => {
+      const d = new Date(today);
+      d.setDate(d.getDate() + offsetDays);
+      return d.toISOString().slice(0, 10);
+    };
 
-    const welcomeTasks = [
-      { title: 'Explore the Dashboard', status: 'done', priority: 'medium' },
-      { title: 'Create your first project', status: 'in_progress', priority: 'high' },
-      { title: 'Invite a team member', status: 'todo', priority: 'low' }
+    // Project 1 — an ongoing website redesign
+    const p1 = db.prepare(
+      'INSERT INTO projects (name, description, color, owner_id) VALUES (?,?,?,?)'
+    ).run('Website Redesign', 'Full overhaul of the marketing site. Mobile-first, faster load times, new brand.', '#e87c3a', user.id);
+    const pid1 = p1.lastInsertRowid;
+    db.prepare('INSERT INTO project_members (project_id, user_id, role) VALUES (?,?,?)').run(pid1, user.id, 'admin');
+
+    const webTasks = [
+      { title: 'Audit current site for performance issues', status: 'done',        priority: 'high',   due: dt(-8)  },
+      { title: 'Design new homepage mockups in Figma',      status: 'done',        priority: 'high',   due: dt(-4)  },
+      { title: 'Migrate blog to new CMS',                   status: 'in_progress', priority: 'medium', due: dt(5)   },
+      { title: 'Write copy for the Services page',          status: 'in_progress', priority: 'medium', due: dt(3)   },
+      { title: 'Set up staging environment',                status: 'review',      priority: 'urgent', due: dt(2)   },
+      { title: 'Fix broken links in footer',                status: 'todo',        priority: 'medium', due: dt(-2)  },
+      { title: 'Final QA pass before go-live',              status: 'todo',        priority: 'urgent', due: dt(10)  },
     ];
-
-    for (const t of welcomeTasks) {
-      db.prepare('INSERT INTO tasks (title, status, priority, project_id, creator_id, assignee_id) VALUES (?,?,?,?,?,?)')
-        .run(t.title, t.status, t.priority, pid, user.id, user.id);
+    for (const t of webTasks) {
+      db.prepare('INSERT INTO tasks (title, status, priority, project_id, creator_id, assignee_id, due_date) VALUES (?,?,?,?,?,?,?)')
+        .run(t.title, t.status, t.priority, pid1, user.id, user.id, t.due);
     }
+
+    // Project 2 — a feature sprint
+    const p2 = db.prepare(
+      'INSERT INTO projects (name, description, color, owner_id) VALUES (?,?,?,?)'
+    ).run('Q3 Feature Sprint', 'Ship offline mode, push notifications, and a redesigned home screen before end of quarter.', '#6366f1', user.id);
+    const pid2 = p2.lastInsertRowid;
+    db.prepare('INSERT INTO project_members (project_id, user_id, role) VALUES (?,?,?)').run(pid2, user.id, 'admin');
+
+    const sprintTasks = [
+      { title: 'Offline data sync — design spec',       status: 'done',        priority: 'urgent', due: dt(-10) },
+      { title: 'Implement offline SQLite layer',         status: 'done',        priority: 'high',   due: dt(-6)  },
+      { title: 'Push notification service (FCM/APNs)',   status: 'in_progress', priority: 'high',   due: dt(4)   },
+      { title: 'Redesign home screen layout',            status: 'in_progress', priority: 'medium', due: dt(6)   },
+      { title: 'Write unit tests for sync logic',        status: 'todo',        priority: 'high',   due: dt(7)   },
+      { title: 'Fix crash on low-memory devices',        status: 'todo',        priority: 'urgent', due: dt(-3)  },
+      { title: 'App store listing and screenshots',      status: 'todo',        priority: 'medium', due: dt(14)  },
+    ];
+    for (const t of sprintTasks) {
+      db.prepare('INSERT INTO tasks (title, status, priority, project_id, creator_id, assignee_id, due_date) VALUES (?,?,?,?,?,?,?)')
+        .run(t.title, t.status, t.priority, pid2, user.id, user.id, t.due);
+    }
+
+    // Project 3 — a marketing campaign
+    const p3 = db.prepare(
+      'INSERT INTO projects (name, description, color, owner_id) VALUES (?,?,?,?)'
+    ).run('Launch Campaign', 'Product Hunt launch + LinkedIn series + email drip targeting SMBs.', '#10b981', user.id);
+    const pid3 = p3.lastInsertRowid;
+    db.prepare('INSERT INTO project_members (project_id, user_id, role) VALUES (?,?,?)').run(pid3, user.id, 'admin');
+
+    const mktTasks = [
+      { title: 'Write 5-part LinkedIn content series',        status: 'done',        priority: 'medium', due: dt(-5) },
+      { title: 'Design Product Hunt banner and gallery',      status: 'in_progress', priority: 'high',   due: dt(2)  },
+      { title: 'Set up email drip campaign in Mailchimp',     status: 'in_progress', priority: 'high',   due: dt(5)  },
+      { title: 'Update website with campaign landing page',   status: 'todo',        priority: 'urgent', due: dt(-1) },
+      { title: 'Schedule launch day social posts',            status: 'todo',        priority: 'medium', due: dt(9)  },
+    ];
+    for (const t of mktTasks) {
+      db.prepare('INSERT INTO tasks (title, status, priority, project_id, creator_id, assignee_id, due_date) VALUES (?,?,?,?,?,?,?)')
+        .run(t.title, t.status, t.priority, pid3, user.id, user.id, t.due);
+    }
+
+    // Seed activity log so the activity feed looks alive
+    const acts = [
+      [pid1, user.id, 'completed', 'task', null, 'Audit current site for performance issues'],
+      [pid1, user.id, 'completed', 'task', null, 'Design new homepage mockups in Figma'],
+      [pid1, user.id, 'started',   'task', null, 'Migrate blog to new CMS'],
+      [pid2, user.id, 'completed', 'task', null, 'Offline data sync — design spec'],
+      [pid2, user.id, 'completed', 'task', null, 'Implement offline SQLite layer'],
+      [pid2, user.id, 'started',   'task', null, 'Push notification service setup'],
+      [pid3, user.id, 'completed', 'task', null, 'Write 5-part LinkedIn content series'],
+      [pid3, user.id, 'started',   'task', null, 'Design Product Hunt banner'],
+    ];
+    for (const a of acts) {
+      db.prepare('INSERT INTO activity_log (project_id, user_id, action, entity, entity_id, detail) VALUES (?,?,?,?,?,?)').run(...a);
+    }
+
   } catch (seedErr) {
-    // Silent fail for seeding, don't break signup
     console.error('Seed error:', seedErr);
   }
 

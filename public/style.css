@@ -195,6 +195,13 @@ h1, h2, h3, .brand {
 .task:hover { border-color: var(--accent); transform: scale(1.02); }
 .task.dragging { opacity: 0.5; cursor: grabbing; }
 
+/* Compact Mode Overrides */
+.board.compact .col { padding: 10px; width: 260px; flex: 0 0 260px; }
+.board.compact .task { padding: 10px 12px; font-size: 0.85rem; }
+.board.compact .task .meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.board.compact .badge { font-size: 0.6rem; padding: 2px 4px; }
+
+
 /* Buttons & Inputs */
 .btn {
   display: inline-flex;
