@@ -12,7 +12,6 @@ function validate(req, res) {
   return true;
 }
 
-// List all projects for user
 router.get('/', authenticate, (req, res) => {
   const projects = db.prepare(`
     SELECT p.*, pm.role,
@@ -28,7 +27,6 @@ router.get('/', authenticate, (req, res) => {
   res.json(projects);
 });
 
-// Create a new project
 router.post('/', authenticate, [
   body('name').trim().isLength({ min: 1, max: 100 }).withMessage('Project name is required (max 100 chars)'),
   body('description').optional({ nullable: true }).trim().isLength({ max: 500 }).withMessage('Description max 500 chars'),
@@ -43,7 +41,7 @@ router.post('/', authenticate, [
     'INSERT INTO projects (name, description, color, owner_id) VALUES (?, ?, ?, ?)'
   ).run(name, description || '', projectColor, req.user.id);
 
-  // Creator is automatically an admin member
+  
   db.prepare(
     'INSERT INTO project_members (project_id, user_id, role) VALUES (?, ?, ?)'
   ).run(result.lastInsertRowid, req.user.id, 'admin');
@@ -54,7 +52,6 @@ router.post('/', authenticate, [
   res.status(201).json(project);
 });
 
-// Get project by ID
 router.get('/:projectId', authenticate, requireProjectRole('member'), (req, res) => {
   const project = db.prepare(`
     SELECT p.*, u.name AS owner_name, pm_me.role AS my_role,
@@ -79,8 +76,6 @@ router.get('/:projectId', authenticate, requireProjectRole('member'), (req, res)
   res.json({ ...project, members });
 });
 
-// Update project (Admin only)
-// Admin only
 router.patch('/:projectId', authenticate, requireProjectRole('admin'), [
   body('name').optional().trim().isLength({ min: 1, max: 100 }).withMessage('Name must be 1–100 chars'),
   body('description').optional({ nullable: true }).trim().isLength({ max: 500 }).withMessage('Description max 500 chars'),
@@ -109,8 +104,6 @@ router.patch('/:projectId', authenticate, requireProjectRole('admin'), [
   res.json(db.prepare('SELECT * FROM projects WHERE id = ?').get(req.params.projectId));
 });
 
-// Delete project (Owner only)
-// Owner only (even among admins)
 router.delete('/:projectId', authenticate, requireProjectRole('admin'), (req, res) => {
   const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(req.params.projectId);
   if (!project) return res.status(404).json({ error: 'Project not found' });
@@ -122,8 +115,6 @@ router.delete('/:projectId', authenticate, requireProjectRole('admin'), (req, re
   res.json({ message: 'Project deleted successfully' });
 });
 
-// Invite a user by ID (Admin only)
-// Admin only — invite a user by ID
 router.post('/:projectId/members', authenticate, requireProjectRole('admin'), [
   body('user_id').isInt({ min: 1 }).withMessage('Valid user_id required'),
   body('role').isIn(['admin', 'member']).withMessage('Role must be admin or member'),
@@ -148,8 +139,6 @@ router.post('/:projectId/members', authenticate, requireProjectRole('admin'), [
   res.status(201).json({ message: 'Member added', user, role });
 });
 
-// Change member role (Admin only)
-// Admin only — change a member's role
 router.patch('/:projectId/members/:userId', authenticate, requireProjectRole('admin'), [
   body('role').isIn(['admin', 'member']).withMessage('Role must be admin or member'),
 ], (req, res) => {
@@ -159,7 +148,7 @@ router.patch('/:projectId/members/:userId', authenticate, requireProjectRole('ad
   const userId = parseInt(req.params.userId, 10);
   const project = db.prepare('SELECT owner_id FROM projects WHERE id = ?').get(req.params.projectId);
 
-  // Cannot demote the owner
+  
   if (userId === project.owner_id && role !== 'admin') {
     return res.status(400).json({ error: 'Cannot change the role of the project owner' });
   }
@@ -177,8 +166,6 @@ router.patch('/:projectId/members/:userId', authenticate, requireProjectRole('ad
   res.json({ message: 'Role updated successfully' });
 });
 
-// Remove a member (Admin only)
-// Admin only — remove a member (cannot remove owner)
 router.delete('/:projectId/members/:userId', authenticate, requireProjectRole('admin'), (req, res) => {
   const userId = parseInt(req.params.userId, 10);
   const project = db.prepare('SELECT owner_id FROM projects WHERE id = ?').get(req.params.projectId);
@@ -195,8 +182,6 @@ router.delete('/:projectId/members/:userId', authenticate, requireProjectRole('a
   res.json({ message: 'Member removed successfully' });
 });
 
-// View activity log
-// Any member can view activity log
 router.get('/:projectId/activity', authenticate, requireProjectRole('member'), (req, res) => {
   const logs = db.prepare(`
     SELECT a.*, u.name AS user_name, u.avatar_color

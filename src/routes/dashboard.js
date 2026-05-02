@@ -2,7 +2,6 @@ const router = require('express').Router();
 const db = require('../models/database');
 const { authenticate } = require('../middleware/auth');
 
-// GET /api/dashboard - aggregated stats for logged-in user
 router.get('/', authenticate, (req, res) => {
   const uid = req.user.id;
   const today = new Date().toISOString().split('T')[0];

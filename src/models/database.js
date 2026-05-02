@@ -8,14 +8,12 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 const db = new Database(DB_PATH);
 
-// Performance & safety pragmas
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 db.pragma('synchronous = NORMAL');
 db.pragma('temp_store = MEMORY');
-db.pragma('cache_size = -16000'); // 16MB cache
+db.pragma('cache_size = -16000'); 
 
-// Database Schema
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -91,7 +89,6 @@ db.exec(`
   );
 `);
 
-// Database Indexes
 db.exec(`
   CREATE INDEX IF NOT EXISTS idx_pm_project  ON project_members(project_id);
   CREATE INDEX IF NOT EXISTS idx_pm_user     ON project_members(user_id);
@@ -104,7 +101,6 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_activity_user  ON activity_log(user_id);
 `);
 
-// Activity Logger Helper
 const logActivity = db.prepare(
   'INSERT INTO activity_log (project_id, user_id, action, entity, entity_id, detail) VALUES (?,?,?,?,?,?)'
 );

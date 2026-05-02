@@ -3,7 +3,6 @@ const db = require('../models/database');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'taskflow-dev-secret-change-in-production';
 
-// Verifies Bearer JWT and attaches user to request
 const authenticate = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -31,7 +30,6 @@ const authenticate = (req, res, next) => {
   }
 };
 
-// RBAC guard for project routes (minRole: member | admin)
 const ROLE_RANK = { member: 0, admin: 1 };
 
 const requireProjectRole = (minRole) => (req, res, next) => {

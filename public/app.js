@@ -1,20 +1,13 @@
-/**
- * Ethara — main client script
- * Kept intentionally simple. No build step, no framework.
- */
-
-const _ep = '/api'; // Backend entry point
+const _ep = '/api'; 
 const select = (id) => document.getElementById(id);
 const query = (s) => document.querySelector(s);
 
-// Global State
 let auth_token = localStorage.getItem('ethara_v1_token');
 let user_ctx = null;
 let active_proj = null;
 let proj_role = null;
 let project_members = [];
 
-// UI Constants
 const STATUS_COLS = [
   { id: 'todo', label: 'To Do', hex: '#94a3b8' },
   { id: 'in_progress', label: 'In Progress', hex: '#6366f1' },
@@ -22,12 +15,10 @@ const STATUS_COLS = [
   { id: 'done', label: 'Done', hex: '#10b981' },
 ];
 
-// Utils
 const getInitials = (n) => (n||'').split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2);
 const formatDate = (d) => d ? new Date(d).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : '—';
 const checkOverdue = (d) => d && new Date(d) < new Date().setHours(0,0,0,0);
 
-// Notify system
 function notify(msg, type = 'info') {
   const box = select('toasts');
   const el = document.createElement('div');
@@ -41,7 +32,6 @@ function notify(msg, type = 'info') {
   }, 3000);
 }
 
-// XHR/Fetch Wrapper
 async function request(method, path, data) {
   const opts = {
     method,
@@ -59,14 +49,13 @@ async function request(method, path, data) {
   return json;
 }
 
-// Logic: Auth
 function switchAuth(tab, prefill = '') {
   const isLogin = tab === 'login';
   select('tab-login').classList.toggle('active', isLogin);
   select('tab-signup').classList.toggle('active', !isLogin);
   select('form-login').style.display = isLogin ? 'block' : 'none';
   select('form-signup').style.display = !isLogin ? 'block' : 'none';
-  // clear error and re-trigger animation if shown again
+  
   const err = select('auth-error');
   err.classList.remove('visible');
   err.textContent = '';
@@ -76,9 +65,9 @@ function switchAuth(tab, prefill = '') {
 function showAuthError(msg) {
   const el = select('auth-error');
   el.textContent = msg;
-  // Remove and re-add to retrigger shake animation
+  
   el.classList.remove('visible');
-  void el.offsetWidth; // force reflow
+  void el.offsetWidth; 
   el.classList.add('visible');
 }
 
@@ -154,7 +143,6 @@ function doLogout() {
   select('auth').style.display = 'grid';
 }
 
-// Navigation
 function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   select(`page-${page}`).classList.add('active');
@@ -165,7 +153,6 @@ function navigate(page) {
   if (page === 'projects') loadProjs();
 }
 
-// Core App Boot
 function bootApp() {
   select('auth').style.display = 'none';
   select('app').style.display = 'block';
@@ -181,7 +168,6 @@ function bootApp() {
   navigate('dashboard');
 }
 
-// Dash Logic
 async function loadDash() {
   try {
     const d = await request('GET', '/dashboard');
@@ -190,7 +176,7 @@ async function loadDash() {
     select('s-done').textContent = d.tasks.done || 0;
     select('s-overdue').textContent = d.overdue.length;
 
-    // Mini progress bars
+    
     const t = d.tasks;
     const total = t.total || 1;
     select('stats').innerHTML = [
@@ -206,7 +192,7 @@ async function loadDash() {
       </div>
     `).join('');
 
-    // Recent list
+    
     select('recent').innerHTML = d.recentTasks.length ? d.recentTasks.map(t => `
       <div class="task fade-in" onclick="openProjTask(${t.project_id}, ${t.id})">
         <div style="font-weight:600">${t.title}</div>
@@ -217,7 +203,7 @@ async function loadDash() {
       </div>
     `).join('') : '<div class="empty">No recent tasks</div>';
 
-    // Overdue list
+    
     select('overdue').innerHTML = d.overdue.length ? d.overdue.map(t => `
       <div class="task fade-in" onclick="openProjTask(${t.project_id}, ${t.id})">
         <div style="font-weight:600;color:#ef4444">${t.title}</div>
@@ -228,7 +214,7 @@ async function loadDash() {
       </div>
     `).join('') : '<div class="empty">Clean slate! No overdue tasks.</div>';
 
-    // Proj Stats
+    
     select('projStats').innerHTML = d.projectStats.map(p => {
       const pct = p.total_tasks ? Math.round((p.done_tasks/p.total_tasks)*100) : 0;
       return `
@@ -245,7 +231,6 @@ async function loadDash() {
   } catch (err) { notify(err.message, 'error'); }
 }
 
-// Project Logic
 async function loadProjs() {
   try {
     const ps = await request('GET', '/projects');
@@ -288,7 +273,7 @@ async function openProj(id) {
     navigate('project');
     syncBoard();
 
-    // Restore compact mode preference
+    
     const isCompact = localStorage.getItem('ethara_compact') === 'true';
     select('compactToggle').checked = isCompact;
     if (isCompact) select('board').classList.add('compact');
@@ -356,7 +341,6 @@ async function syncBoard() {
   } catch (err) { notify(err.message, 'error'); }
 }
 
-// Drag & Drop
 function handleDragStart(e) {
   e.dataTransfer.setData('task_id', e.target.dataset.id);
   e.target.classList.add('dragging');
@@ -374,7 +358,6 @@ async function handleDrop(e) {
   } catch (err) { notify(err.message, 'error'); }
 }
 
-// Modals
 function showModal(html) {
   select('modal').innerHTML = html;
   select('modalWrap').classList.add('open');
@@ -487,7 +470,6 @@ async function postComment(id) {
   } catch (err) { notify(err.message, 'error'); }
 }
 
-// Misc Logic
 function toggleCompactMode(e) {
   if (e.target.checked) {
     select('board').classList.add('compact');
@@ -498,18 +480,17 @@ function toggleCompactMode(e) {
   }
 }
 
-// Global Keyboard Shortcuts
 document.addEventListener('keydown', (e) => {
-  // Ignore if user is typing in an input or textarea
+  
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-  // 'N' to create new task if on a project board
+  
   if (e.key.toLowerCase() === 'n' && active_proj && select('tab-board').style.display === 'block') {
     e.preventDefault();
     openNewTaskModal('todo');
   }
 
-  // 'Escape' to close modals
+  
   if (e.key === 'Escape' && select('modalWrap').classList.contains('open')) {
     hideModal();
   }

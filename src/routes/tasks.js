@@ -24,7 +24,6 @@ function getFullTask(taskId) {
   `).get(taskId);
 }
 
-// Get tasks for a project
 router.get('/', authenticate, requireProjectRole('member'), [
   query('status').optional().isIn(['todo','in_progress','review','done']),
   query('priority').optional().isIn(['low','medium','high','urgent']),
@@ -53,7 +52,6 @@ router.get('/', authenticate, requireProjectRole('member'), [
   res.json(db.prepare(sql).all(...params));
 });
 
-// Create task
 router.post('/', authenticate, requireProjectRole('member'), [
   body('title').trim().isLength({ min: 1, max: 200 }).withMessage('Title required (max 200 chars)'),
   body('description').optional({ nullable: true }).trim().isLength({ max: 2000 }),
@@ -83,13 +81,12 @@ router.post('/', authenticate, requireProjectRole('member'), [
 
   db.logActivity(req.params.projectId, req.user.id, 'created', 'task', result.lastInsertRowid, title);
 
-  // Update project updated_at
+  
   db.prepare('UPDATE projects SET updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(req.params.projectId);
 
   res.status(201).json(getFullTask(result.lastInsertRowid));
 });
 
-// Get specific task details
 router.get('/:taskId', authenticate, requireProjectRole('member'), (req, res) => {
   const task = db.prepare(`
     SELECT t.*,
@@ -114,9 +111,6 @@ router.get('/:taskId', authenticate, requireProjectRole('member'), (req, res) =>
   res.json({ ...task, comments });
 });
 
-// Update task status or details
-// Admin: can edit any task
-// Member: can only edit tasks they created or are assigned to
 router.patch('/:taskId', authenticate, requireProjectRole('member'), [
   body('title').optional().trim().isLength({ min: 1, max: 200 }).withMessage('Title max 200 chars'),
   body('description').optional({ nullable: true }).trim().isLength({ max: 2000 }),
@@ -131,7 +125,7 @@ router.patch('/:taskId', authenticate, requireProjectRole('member'), [
     .get(req.params.taskId, req.params.projectId);
   if (!task) return res.status(404).json({ error: 'Task not found' });
 
-  // RBAC: members can only edit their own tasks
+  
   const isAdmin    = req.projectRole === 'admin';
   const isCreator  = task.creator_id  === req.user.id;
   const isAssignee = task.assignee_id === req.user.id;
@@ -173,8 +167,6 @@ router.patch('/:taskId', authenticate, requireProjectRole('member'), [
   res.json(getFullTask(req.params.taskId));
 });
 
-// Delete task
-// Admin or task creator can delete
 router.delete('/:taskId', authenticate, requireProjectRole('member'), (req, res) => {
   const task = db.prepare('SELECT * FROM tasks WHERE id = ? AND project_id = ?')
     .get(req.params.taskId, req.params.projectId);
@@ -191,7 +183,6 @@ router.delete('/:taskId', authenticate, requireProjectRole('member'), (req, res)
   res.json({ message: 'Task deleted successfully' });
 });
 
-// Add comment to task
 router.post('/:taskId/comments', authenticate, requireProjectRole('member'), [
   body('content').trim().isLength({ min: 1, max: 1000 }).withMessage('Comment must be 1–1000 characters'),
 ], (req, res) => {

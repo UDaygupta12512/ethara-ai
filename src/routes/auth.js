@@ -11,7 +11,6 @@ const AVATAR_COLORS = [
   '#14b8a6','#f97316','#84cc16','#a855f7',
 ];
 
-// Validation helpers
 const nameRules  = body('name').trim().isLength({ min: 2, max: 50 }).withMessage('Name must be 2–50 characters');
 const emailRules = body('email').isEmail().trim().toLowerCase().withMessage('Valid email address required');
 const passRules  = body('password').isLength({ min: 6, max: 128 }).withMessage('Password must be 6–128 characters');
@@ -25,7 +24,6 @@ function validate(req, res) {
   return true;
 }
 
-// Signup route
 router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
   if (!validate(req, res)) return;
 
@@ -48,7 +46,7 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
 
   const user  = db.prepare('SELECT id, name, email, avatar_color, created_at FROM users WHERE id = ?').get(result.lastInsertRowid);
   
-  // Seed rich starter data so the dashboard always looks alive
+  
   try {
     const today = new Date();
     const dt = (offsetDays) => {
@@ -57,7 +55,7 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
       return d.toISOString().slice(0, 10);
     };
 
-    // Project 1 — an ongoing website redesign
+    
     const p1 = db.prepare(
       'INSERT INTO projects (name, description, color, owner_id) VALUES (?,?,?,?)'
     ).run('Website Redesign', 'Full overhaul of the marketing site. Mobile-first, faster load times, new brand.', '#e87c3a', user.id);
@@ -78,7 +76,7 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
         .run(t.title, t.status, t.priority, pid1, user.id, user.id, t.due);
     }
 
-    // Project 2 — a feature sprint
+    
     const p2 = db.prepare(
       'INSERT INTO projects (name, description, color, owner_id) VALUES (?,?,?,?)'
     ).run('Q3 Feature Sprint', 'Ship offline mode, push notifications, and a redesigned home screen before end of quarter.', '#6366f1', user.id);
@@ -99,7 +97,7 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
         .run(t.title, t.status, t.priority, pid2, user.id, user.id, t.due);
     }
 
-    // Project 3 — a marketing campaign
+    
     const p3 = db.prepare(
       'INSERT INTO projects (name, description, color, owner_id) VALUES (?,?,?,?)'
     ).run('Launch Campaign', 'Product Hunt launch + LinkedIn series + email drip targeting SMBs.', '#10b981', user.id);
@@ -118,7 +116,7 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
         .run(t.title, t.status, t.priority, pid3, user.id, user.id, t.due);
     }
 
-    // Seed activity log so the activity feed looks alive
+    
     const acts = [
       [pid1, user.id, 'completed', 'task', null, 'Audit current site for performance issues'],
       [pid1, user.id, 'completed', 'task', null, 'Design new homepage mockups in Figma'],
@@ -141,7 +139,6 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
   res.status(201).json({ token, user });
 });
 
-// Login route
 router.post('/login', [emailRules, passRules], (req, res) => {
   if (!validate(req, res)) return;
 
@@ -162,12 +159,10 @@ router.post('/login', [emailRules, passRules], (req, res) => {
   res.json({ token, user: safeUser });
 });
 
-// Get current user
 router.get('/me', authenticate, (req, res) => {
   res.json({ user: req.user });
 });
 
-// Update profile
 router.patch('/me', authenticate, [
   body('name').optional().trim().isLength({ min: 2, max: 50 }).withMessage('Name must be 2–50 characters'),
   body('avatar_color').optional().matches(/^#[0-9a-fA-F]{6}$/).withMessage('Invalid color format'),
@@ -186,7 +181,6 @@ router.patch('/me', authenticate, [
   res.json({ user: updated });
 });
 
-// Change password
 router.post('/change-password', authenticate, [
   body('current_password').notEmpty().withMessage('Current password required'),
   body('new_password').isLength({ min: 6, max: 128 }).withMessage('New password must be 6–128 characters'),
@@ -204,7 +198,6 @@ router.post('/change-password', authenticate, [
   res.json({ message: 'Password changed successfully' });
 });
 
-// Search users
 router.get('/users/search', authenticate, [
   query('q').trim().isLength({ min: 2, max: 100 }).withMessage('Query must be 2–100 characters'),
 ], (req, res) => {
