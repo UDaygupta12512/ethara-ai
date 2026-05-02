@@ -14,7 +14,16 @@ if (process.env.DB_PATH) {
 }
 
 console.log('[DB] Using database at:', DB_PATH);
-const db = new Database(DB_PATH);
+
+let db;
+try {
+  db = new Database(DB_PATH);
+} catch (err) {
+  console.error('[DB] Failed to open database:', err.message);
+  console.error('[DB] This usually means better-sqlite3 native binary is broken.');
+  console.error('[DB] Try setting startCommand to: npm rebuild better-sqlite3 --build-from-source && npm start');
+  process.exit(1);
+}
 
 db.pragma('journal_mode = DELETE');
 db.pragma('foreign_keys = ON');
