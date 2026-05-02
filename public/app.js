@@ -55,7 +55,7 @@ function switchAuth(tab, prefill = '') {
   select('tab-signup').classList.toggle('active', !isLogin);
   select('form-login').style.display = isLogin ? 'block' : 'none';
   select('form-signup').style.display = !isLogin ? 'block' : 'none';
-  
+
   const err = select('auth-error');
   err.classList.remove('visible');
   err.textContent = '';
@@ -65,7 +65,7 @@ function switchAuth(tab, prefill = '') {
 function showAuthError(msg) {
   const el = select('auth-error');
   el.textContent = msg;
-  
+
   el.classList.remove('visible');
   void el.offsetWidth; 
   el.classList.add('visible');
@@ -176,7 +176,6 @@ async function loadDash() {
     select('s-done').textContent = d.tasks.done || 0;
     select('s-overdue').textContent = d.overdue.length;
 
-    
     const t = d.tasks;
     const total = t.total || 1;
     select('stats').innerHTML = [
@@ -192,7 +191,6 @@ async function loadDash() {
       </div>
     `).join('');
 
-    
     select('recent').innerHTML = d.recentTasks.length ? d.recentTasks.map(t => `
       <div class="task fade-in" onclick="openProjTask(${t.project_id}, ${t.id})">
         <div style="font-weight:600">${t.title}</div>
@@ -203,7 +201,6 @@ async function loadDash() {
       </div>
     `).join('') : '<div class="empty">No recent tasks</div>';
 
-    
     select('overdue').innerHTML = d.overdue.length ? d.overdue.map(t => `
       <div class="task fade-in" onclick="openProjTask(${t.project_id}, ${t.id})">
         <div style="font-weight:600;color:#ef4444">${t.title}</div>
@@ -214,7 +211,6 @@ async function loadDash() {
       </div>
     `).join('') : '<div class="empty">Clean slate! No overdue tasks.</div>';
 
-    
     select('projStats').innerHTML = d.projectStats.map(p => {
       const pct = p.total_tasks ? Math.round((p.done_tasks/p.total_tasks)*100) : 0;
       return `
@@ -255,12 +251,12 @@ async function openProj(id) {
   try {
     const p = await request('GET', `/projects/${id}`);
     active_proj = p; proj_role = p.my_role; project_members = p.members;
-    
+
     select('p-name').textContent = p.name;
     select('p-desc').textContent = p.description || 'No description provided.';
     select('p-dot').style.background = p.color;
     select('p-role').innerHTML = `<span class="role-badge ${proj_role}">${proj_role}</span>`;
-    
+
     const pct = p.task_count ? Math.round((p.done_count/p.task_count)*100) : 0;
     select('p-progress').style.width = pct + '%';
     select('p-progress').style.background = p.color;
@@ -273,7 +269,6 @@ async function openProj(id) {
     navigate('project');
     syncBoard();
 
-    
     const isCompact = localStorage.getItem('ethara_compact') === 'true';
     select('compactToggle').checked = isCompact;
     if (isCompact) select('board').classList.add('compact');
@@ -288,7 +283,7 @@ function setProjectTab(tab) {
   select('tab-list').style.display = tab === 'list' ? 'block' : 'none';
   select('tab-members').style.display = tab === 'members' ? 'block' : 'none';
   select('tab-activity').style.display = tab === 'activity' ? 'block' : 'none';
-  
+
   if (tab === 'list') syncTaskList();
   if (tab === 'members') renderProjectMembers();
   if (tab === 'activity') syncActivityLog();
@@ -351,7 +346,7 @@ async function handleDrop(e) {
   const taskId = e.dataTransfer.getData('task_id');
   const targetCol = e.currentTarget.closest('.col');
   const newStatus = targetCol.dataset.status;
-  
+
   try {
     await request('PATCH', `/projects/${active_proj.id}/tasks/${taskId}`, { status: newStatus });
     syncBoard();
@@ -388,7 +383,7 @@ function openNewTaskModal(status) {
 async function submitNewTask(e, status) {
   const title = select('nt-title').value.trim();
   if (!title) return notify('Title is required', 'error');
-  
+
   try {
     await request('POST', `/projects/${active_proj.id}/tasks`, {
       title,
@@ -408,7 +403,7 @@ async function openTaskModal(id) {
   try {
     const t = await request('GET', `/projects/${active_proj.id}/tasks/${id}`);
     const membersOptions = project_members.map(m => `<option value="${m.id}" ${t.assignee_id===m.id?'selected':''}>${m.name}</option>`).join('');
-    
+
     showModal(`
       <div class="m-h">
         <div class="m-title">Edit Task</div>
@@ -481,16 +476,14 @@ function toggleCompactMode(e) {
 }
 
 document.addEventListener('keydown', (e) => {
-  
+
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-  
   if (e.key.toLowerCase() === 'n' && active_proj && select('tab-board').style.display === 'block') {
     e.preventDefault();
     openNewTaskModal('todo');
   }
 
-  
   if (e.key === 'Escape' && select('modalWrap').classList.contains('open')) {
     hideModal();
   }

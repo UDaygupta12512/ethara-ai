@@ -45,8 +45,7 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
   }
 
   const user  = db.prepare('SELECT id, name, email, avatar_color, created_at FROM users WHERE id = ?').get(result.lastInsertRowid);
-  
-  
+
   try {
     const today = new Date();
     const dt = (offsetDays) => {
@@ -55,7 +54,6 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
       return d.toISOString().slice(0, 10);
     };
 
-    
     const p1 = db.prepare(
       'INSERT INTO projects (name, description, color, owner_id) VALUES (?,?,?,?)'
     ).run('Website Redesign', 'Full overhaul of the marketing site. Mobile-first, faster load times, new brand.', '#e87c3a', user.id);
@@ -76,7 +74,6 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
         .run(t.title, t.status, t.priority, pid1, user.id, user.id, t.due);
     }
 
-    
     const p2 = db.prepare(
       'INSERT INTO projects (name, description, color, owner_id) VALUES (?,?,?,?)'
     ).run('Q3 Feature Sprint', 'Ship offline mode, push notifications, and a redesigned home screen before end of quarter.', '#6366f1', user.id);
@@ -97,7 +94,6 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
         .run(t.title, t.status, t.priority, pid2, user.id, user.id, t.due);
     }
 
-    
     const p3 = db.prepare(
       'INSERT INTO projects (name, description, color, owner_id) VALUES (?,?,?,?)'
     ).run('Launch Campaign', 'Product Hunt launch + LinkedIn series + email drip targeting SMBs.', '#10b981', user.id);
@@ -116,7 +112,6 @@ router.post('/signup', [nameRules, emailRules, passRules], (req, res) => {
         .run(t.title, t.status, t.priority, pid3, user.id, user.id, t.due);
     }
 
-    
     const acts = [
       [pid1, user.id, 'completed', 'task', null, 'Audit current site for performance issues'],
       [pid1, user.id, 'completed', 'task', null, 'Design new homepage mockups in Figma'],

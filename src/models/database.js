@@ -1,4 +1,3 @@
-// We need better-sqlite3 for the heavy lifting
 const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
@@ -7,7 +6,7 @@ let DB_PATH;
 if (process.env.DB_PATH) {
   DB_PATH = process.env.DB_PATH;
 } else if (process.env.NODE_ENV === 'production') {
-  // Use /tmp for Railway as a quick workaround for persistence
+
   DB_PATH = '/tmp/taskflow.db';
 } else {
   DB_PATH = path.join(__dirname, '../../data/taskflow.db');

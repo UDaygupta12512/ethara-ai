@@ -81,7 +81,6 @@ router.post('/', authenticate, requireProjectRole('member'), [
 
   db.logActivity(req.params.projectId, req.user.id, 'created', 'task', result.lastInsertRowid, title);
 
-  
   db.prepare('UPDATE projects SET updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(req.params.projectId);
 
   res.status(201).json(getFullTask(result.lastInsertRowid));
@@ -125,7 +124,6 @@ router.patch('/:taskId', authenticate, requireProjectRole('member'), [
     .get(req.params.taskId, req.params.projectId);
   if (!task) return res.status(404).json({ error: 'Task not found' });
 
-  
   const isAdmin    = req.projectRole === 'admin';
   const isCreator  = task.creator_id  === req.user.id;
   const isAssignee = task.assignee_id === req.user.id;

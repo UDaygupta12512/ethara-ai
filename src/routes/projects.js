@@ -41,7 +41,6 @@ router.post('/', authenticate, [
     'INSERT INTO projects (name, description, color, owner_id) VALUES (?, ?, ?, ?)'
   ).run(name, description || '', projectColor, req.user.id);
 
-  
   db.prepare(
     'INSERT INTO project_members (project_id, user_id, role) VALUES (?, ?, ?)'
   ).run(result.lastInsertRowid, req.user.id, 'admin');
@@ -148,7 +147,6 @@ router.patch('/:projectId/members/:userId', authenticate, requireProjectRole('ad
   const userId = parseInt(req.params.userId, 10);
   const project = db.prepare('SELECT owner_id FROM projects WHERE id = ?').get(req.params.projectId);
 
-  
   if (userId === project.owner_id && role !== 'admin') {
     return res.status(400).json({ error: 'Cannot change the role of the project owner' });
   }
