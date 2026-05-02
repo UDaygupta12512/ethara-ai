@@ -1,50 +1,43 @@
-# Ethara AI - Premium Task Management
+# Ethara AI 🚀
 
-Ethara AI is a production-ready, task management platform built for modern teams. It features a hand-crafted UI, robust role-based access control, and real-time activity tracking.
+Ethara is a task manager I built for teams who want to stop guessing and start moving. It's not just another Kanban board; it's designed to be fast, secure, and actually pleasant to use every day.
 
-## 🚀 Key Features
-- **Project & Team Management**: Create projects, set brand colors, and invite collaborators.
-- **Kanban Board**: Drag-and-drop tasks to update progress effortlessly.
-- **RBAC**: Multi-role system (Team Lead, Collaborator, Project Owner) with human-friendly permissions.
-- **Dashboard**: Real-time stats, overdue tracking, and global activity feed.
-- **Secure Auth**: JWT-based sessions with high-cost password hashing.
+## What makes it different?
+- **Hand-crafted UI**: No heavy frameworks. Just fast, custom CSS with glassmorphism and a focus on clarity.
+- **Real-time Tracking**: You can see exactly who's doing what without refreshing constantly.
+- **Built for Security**: It uses high-cost bcrypt hashing and JWT sessions. It's production-ready from day one.
+- **Fast Database**: Built on SQLite with WAL mode for performance that's usually overkill for a task manager.
 
-## 🛠️ Tech Stack
+## Quick Start
+
+1. **Install things**:
+   ```bash
+   npm install
+   ```
+
+2. **Setup your environment**:
+   Create a `.env` file (see `.env.example`). Don't forget to set a strong `JWT_SECRET`!
+
+3. **Get some data in there**:
+   ```bash
+   node scripts/seed.js
+   ```
+
+4. **Run it**:
+   ```bash
+   npm run dev
+   ```
+
+## The Stack
 - **Frontend**: Vanilla JS (ES6+), Modern CSS (Custom properties, Glassmorphism).
 - **Backend**: Node.js, Express.
-- **Database**: SQLite (better-sqlite3) with WAL mode enabled for high performance.
-- **Security**: Helmet, Rate Limiting, express-validator.
+- **Database**: SQLite (via better-sqlite3) — it's fast and file-based.
+- **Security**: Hardened with Helmet and Rate Limiting.
 
-## 🏁 Getting Started
+## Folders
+- `/src` - All the backend magic.
+- `/public` - Where the frontend lives.
+- `/scripts` - Useful tools for seeding and testing.
 
-### 1. Installation
-```bash
-npm install
-```
-
-### 2. Environment Setup
-Create a `.env` file in the root:
-```env
-PORT=3000
-JWT_SECRET=your_random_secret_here
-```
-
-### 3. Initialize & Seed
-```bash
-# Seed with demo data
-node scripts/seed.js
-```
-
-### 4. Start Development
-```bash
-npm run dev
-```
-
-## 📂 Project Structure
-- `/src` - Backend logic, routes, and middleware.
-- `/public` - Frontend assets and core application logic.
-- `/data` - Local SQLite storage (auto-created).
-- `/scripts` - Utilities for seeding and testing.
-
-## 📄 License
-MIT
+## License
+MIT. Feel free to use it for whatever.

@@ -1,3 +1,4 @@
+// We need better-sqlite3 for the heavy lifting
 const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
@@ -6,6 +7,7 @@ let DB_PATH;
 if (process.env.DB_PATH) {
   DB_PATH = process.env.DB_PATH;
 } else if (process.env.NODE_ENV === 'production') {
+  // Use /tmp for Railway as a quick workaround for persistence
   DB_PATH = '/tmp/taskflow.db';
 } else {
   DB_PATH = path.join(__dirname, '../../data/taskflow.db');
@@ -19,9 +21,8 @@ let db;
 try {
   db = new Database(DB_PATH);
 } catch (err) {
-  console.error('[DB] Failed to open database:', err.message);
-  console.error('[DB] This usually means better-sqlite3 native binary is broken.');
-  console.error('[DB] Try setting startCommand to: npm rebuild better-sqlite3 --build-from-source && npm start');
+  console.error('[DB Error] Something went wrong opening the file:', err.message);
+  console.error('Check if better-sqlite3 binary is compiled for this OS.');
   process.exit(1);
 }
 
