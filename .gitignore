@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+.npm
+npm-debug.log*
+
+# Database
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Scripts & Scratch
+scratch/
+scripts/smoke-test.js
